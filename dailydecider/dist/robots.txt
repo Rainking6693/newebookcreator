@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://dailydecider.app/sitemap.xml
+
+# Crawl-delay for polite bots
+Crawl-delay: 1
+
+# Block sensitive paths
+Disallow: /api/
+Disallow: /analytics/
+Disallow: *.json$
+Disallow: /scripts/
+Disallow: /docs/

@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+                <link rel="dns-prefetch" href="//fonts.googleapis.com">
+                <link rel="dns-prefetch" href="//fonts.gstatic.com">
+                <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                <link rel="preload" href="/src/app.js" as="script">
+                <link rel="preload" href="/data/compliments.json" as="fetch" type="application/json" crossorigin>
+            
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Daily Decider - The ultimate AI-powered daily decision maker and compliment generator. Make better decisions with advanced algorithms, personalized insights, and daily motivation.">
+    <meta name="keywords" content="daily decider, decision maker, daily decisions, AI decisions, compliments generator, daily motivation, decision algorithm, productivity tool, daily routine, decision support">
+    <meta name="author" content="Daily Decider">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Daily Decider - AI-Powered Decision Maker & Daily Compliments">
+    <meta property="og:description" content="Transform your daily decisions with advanced AI algorithms. Get personalized decision support and uplifting compliments tailored to your needs.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dailydecider.app">
+    <meta property="og:image" content="https://dailydecider.app/assets/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Daily Decider - AI Decision Maker">
+    <meta name="twitter:description" content="Advanced decision algorithms meet daily motivation. Make better choices with AI-powered insights.">
+    <meta name="theme-color" content="#6366f1">
+    
+    <title>Daily Decider - AI-Powered Decision Maker & Daily Compliments Generator</title>
+    
+    <link rel="canonical" href="https://dailydecider.app">
+    <link rel="icon" href="/assets/favicon.ico">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --border: #e2e8f0;
+            --surface: #ffffff;
+            --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.1);
+            --shadow-lg: 0 25px 50px -12px rgba(99, 102, 241, 0.25);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+            font-weight: 400;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 15px 25px;
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .main-card {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient);
+        }
+
+        .decision-form {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        textarea, input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--surface);
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .options-container {
+            margin-bottom: 20px;
+        }
+
+        .option-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .option-input input {
+            min-height: 50px;
+            flex: 1;
+        }
+
+        .remove-option {
+            background: var(--error);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            width: 50px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .remove-option:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .add-option {
+            background: var(--secondary);
+            color: var(--text-secondary);
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .add-option:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 16px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px -5px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface);
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .result-section {
+            background: var(--secondary);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 30px;
+            border-left: 4px solid var(--primary);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .confidence-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .confidence-high { background: #d1fae5; color: #065f46; }
+        .confidence-medium { background: #fef3c7; color: #92400e; }
+        .confidence-low { background: #fee2e2; color: #991b1b; }
+
+        .decision-result {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .reasoning {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .factors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .factor {
+            background: var(--surface);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .factor-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .factor-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .compliment-section {
+            background: linear-gradient(135deg, #fef7cd 0%, #fef3c7 100%);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            border: 2px solid #fbbf24;
+            animation: slideUp 0.8s ease-out 0.4s both;
+        }
+
+        .compliment-text {
+            font-size: 1.25rem;
+            color: #92400e;
+            font-weight: 500;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .compliment-category {
+            font-size: 0.875rem;
+            color: #b45309;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin: 60px 0;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            padding: 30px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 16px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .feature-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid var(--border);
+            margin-top: 80px;
+            color: var(--text-secondary);
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 16px; }
+            h1 { font-size: 2.25rem; }
+            .subtitle { font-size: 1.125rem; }
+            .main-card { padding: 24px; }
+            .action-buttons { flex-direction: column; }
+            .hero-stats { gap: 16px; }
+            .stat { padding: 12px 20px; }
+        }
+
+        .hidden { display: none !important; }
+        .fade-in { animation: slideIn 0.5s ease-out; }
+    </style>
+
+                <style id="critical-css">
+                    /* Critical CSS will be inlined here */
+                    :root { --primary: #6366f1; --primary-dark: #4f46e5; --secondary: #f1f5f9; --text-primary: #1e293b; --text-secondary: #64748b; --success: #10b981; --warning: #f59e0b; --error: #ef4444; --border: #e2e8f0; --surface: #ffffff; --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); --shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.1); --shadow-lg: 0 25px 50px -12px rgba(99, 102, 241, 0.25); }
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); color: var(--text-primary); line-height: 1.6; min-height: 100vh; overflow-x: hidden; }
+                    .container { max-width: 800px; margin: 0 auto; padding: 20px; position: relative; }
+                </style>
+                
+                <script type="application/ld+json">
+                {
+                    "@context": "https://schema.org",
+                    "@type": "WebApplication",
+                    "name": "Daily Decider",
+                    "description": "AI-powered decision maker and compliment generator",
+                    "url": "https://dailydecider.app",
+                    "applicationCategory": "ProductivityApplication",
+                    "operatingSystem": "Any",
+                    "browserRequirements": "Requires JavaScript",
+                    "softwareVersion": "1.0.0",
+                    "author": {
+                        "@type": "Organization",
+                        "name": "Daily Decider Team"
+                    },
+                    "offers": {
+                        "@type": "Offer",
+                        "price": "0",
+                        "priceCurrency": "USD"
+                    }
+                }
+                </script>
+                </head>
+            
+<body>
+    <div class="container">
+        <header>
+            <h1>Daily Decider</h1>
+            <p class="subtitle">AI-powered decision making and daily motivation. Transform uncertainty into clarity with advanced algorithms and personalized insights.</p>
+            
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">1,000+</span>
+                    <span class="stat-label">Unique Compliments</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">AI-Powered</span>
+                    <span class="stat-label">Decision Engine</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">Available</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-card">
+            <form class="decision-form" id="decisionForm">
+                <div class="form-group">
+                    <label for="question">What decision are you facing today?</label>
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="question" 
+                            placeholder="Describe your decision or dilemma. Be as specific as you'd like - the more context you provide, the better guidance I can offer."
+                            required
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Decision Options (Optional)</label>
+                    <div class="options-container" id="optionsContainer">
+                        <div class="option-input">
+                            <input type="text" placeholder="Option 1 (e.g., Yes, Go ahead, Option A)">
+                        </div>
+                        <div class="option-input">
+                            <input type="text" placeholder="Option 2 (e.g., No, Wait, Option B)">
+                        </div>
+                    </div>
+                    <button type="button" class="add-option" id="addOption">
+                        + Add Another Option
+                    </button>
+                </div>
+
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        Get My Decision
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="complimentBtn">
+                        Daily Compliment
+                    </button>
+                </div>
+            </form>
+
+            <div id="resultSection" class="result-section hidden">
+                <div class="result-header">
+                    <h3>Your Decision Guidance</h3>
+                    <span class="confidence-badge" id="confidenceBadge"></span>
+                </div>
+                
+                <div class="decision-result" id="decisionResult"></div>
+                <div class="reasoning" id="reasoning"></div>
+                
+                <div class="factors" id="factors"></div>
+            </div>
+        </div>
+
+        <div id="complimentSection" class="compliment-section hidden">
+            <div class="compliment-text" id="complimentText"></div>
+            <div class="compliment-category" id="complimentCategory"></div>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <h3 class="feature-title">Advanced AI Algorithm</h3>
+                <p class="feature-desc">Sophisticated decision engine that considers time, context, sentiment analysis, and personal patterns for optimal guidance.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">⏰</div>
+                <h3 class="feature-title">Temporal Intelligence</h3>
+                <p class="feature-desc">Factors in time of day, season, moon phases, and your personal timing patterns to optimize decision quality.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">💝</div>
+                <h3 class="feature-title">Personalized Compliments</h3>
+                <p class="feature-desc">Over 1,000 unique, contextually-aware compliments that adapt to your personality and current needs.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Pattern Recognition</h3>
+                <p class="feature-desc">Learns from your decision patterns and preferences to provide increasingly personalized guidance over time.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 Daily Decider. Empowering better decisions, one choice at a time.</p>
+    </footer>
+
+    <script defer src="dist/src/sentiment-analyzer.js"></script>
+    <script src="src/temporal-processor.js"></script>
+    <script src="src/pattern-matcher.js"></script>
+    <script src="src/decision-engine.js"></script>
+    <script src="src/compliment-engine.js"></script>
+    <script src="src/analytics.js"></script>
+    <script src="src/app.js"></script>
+
+                <script>
+                    if ('serviceWorker' in navigator) {
+                        window.addEventListener('load', () => {
+                            navigator.serviceWorker.register('/sw.js')
+                                .then(reg => console.log('SW registered:', reg))
+                                .catch(err => console.log('SW registration failed:', err));
+                        });
+                    }
+                </script>
+                </body>
+            
+</html>

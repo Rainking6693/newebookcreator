@@ -1,0 +1,38 @@
+{
+  "preload": [
+    {
+      "href": "/src/app.js",
+      "as": "script"
+    },
+    {
+      "href": "/data/compliments.json",
+      "as": "fetch",
+      "type": "application/json",
+      "crossorigin": true
+    },
+    {
+      "href": "/manifest.json",
+      "as": "manifest"
+    }
+  ],
+  "prefetch": [
+    {
+      "href": "/src/decision-engine.js",
+      "as": "script"
+    },
+    {
+      "href": "/src/compliment-engine.js",
+      "as": "script"
+    }
+  ],
+  "preconnect": [
+    {
+      "href": "https://fonts.googleapis.com",
+      "crossorigin": true
+    },
+    {
+      "href": "https://fonts.gstatic.com",
+      "crossorigin": true
+    }
+  ]
+}

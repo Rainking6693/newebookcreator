@@ -1,0 +1,102 @@
+{
+  "compliments": {
+    "structure": {
+      "id": "number (auto-increment)",
+      "text": "string (max 200 chars)",
+      "category": "enum [morning, afternoon, evening, motivational, achievement, personal, professional, creative, wellness, confidence]",
+      "sentiment_score": "float (0-1)",
+      "complexity_level": "enum [simple, medium, complex]",
+      "personality_tags": "array [ambitious, creative, analytical, social, introspective, adventurous]",
+      "seasonal_relevance": "array [spring, summer, fall, winter, any]",
+      "weather_context": "array [sunny, rainy, cloudy, snowy, any]",
+      "usage_count": "number",
+      "effectiveness_score": "float (0-1)",
+      "created_date": "timestamp",
+      "last_used": "timestamp"
+    },
+    "indexes": [
+      "category",
+      "sentiment_score",
+      "personality_tags",
+      "seasonal_relevance",
+      "effectiveness_score"
+    ]
+  },
+  "decisions": {
+    "structure": {
+      "id": "string (uuid)",
+      "question_hash": "string (sha256 of question)",
+      "decision_type": "enum [binary, multiple_choice, ranking, open_ended]",
+      "algorithm_version": "string",
+      "confidence_score": "float (0-1)",
+      "reasoning_factors": "object {time_influence, pattern_match, sentiment_analysis, context_weight}",
+      "response_time": "number (milliseconds)",
+      "user_satisfaction": "float (0-1, optional)",
+      "follow_up_action": "string (optional)",
+      "created_date": "timestamp",
+      "session_id": "string (uuid)"
+    },
+    "indexes": [
+      "question_hash",
+      "decision_type",
+      "confidence_score",
+      "created_date",
+      "session_id"
+    ]
+  },
+  "analytics": {
+    "structure": {
+      "id": "string (uuid)",
+      "event_type": "enum [page_view, decision_request, compliment_view, engagement, conversion, retention]",
+      "session_id": "string (uuid)",
+      "user_agent": "string",
+      "timestamp": "timestamp",
+      "data": "object (flexible schema based on event_type)",
+      "performance_metrics": "object {load_time, interaction_time, bounce_rate}",
+      "conversion_funnel": "enum [awareness, interest, consideration, intent, evaluation, purchase]",
+      "retention_day": "number (days since first visit)"
+    },
+    "indexes": [
+      "event_type",
+      "session_id",
+      "timestamp",
+      "conversion_funnel"
+    ]
+  },
+  "user_patterns": {
+    "structure": {
+      "session_id": "string (uuid)",
+      "personality_profile": "object {scores for each trait}",
+      "time_preferences": "object {most_active_hours, preferred_days}",
+      "decision_patterns": "object {complexity_preference, response_speed, satisfaction_trends}",
+      "engagement_level": "enum [low, medium, high, power_user]",
+      "first_visit": "timestamp",
+      "last_visit": "timestamp",
+      "total_sessions": "number",
+      "average_session_duration": "number (seconds)",
+      "preferred_categories": "array",
+      "learning_adaptations": "object (ML model adjustments)"
+    },
+    "indexes": [
+      "session_id",
+      "engagement_level",
+      "last_visit",
+      "personality_profile"
+    ]
+  },
+  "performance_cache": {
+    "structure": {
+      "cache_key": "string",
+      "cache_type": "enum [compliment_set, decision_algorithm, user_pattern, weather_data]",
+      "data": "object",
+      "expiry": "timestamp",
+      "hit_count": "number",
+      "created_date": "timestamp"
+    },
+    "indexes": [
+      "cache_key",
+      "cache_type",
+      "expiry"
+    ]
+  }
+}

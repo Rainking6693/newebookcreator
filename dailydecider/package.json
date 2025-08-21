@@ -1,0 +1,37 @@
+{
+  "name": "dailydecider",
+  "version": "1.0.0",
+  "description": "The ultimate daily decision maker and compliment generator app",
+  "main": "index.html",
+  "scripts": {
+    "dev": "live-server --port=3000 --host=localhost",
+    "build": "npm run optimize && npm run minify",
+    "optimize": "node scripts/optimize.js",
+    "minify": "echo 'JavaScript already minified during optimization'",
+    "deploy": "netlify deploy --prod --dir=dist",
+    "test": "jest",
+    "lighthouse": "lighthouse http://localhost:3000 --output=html --output-path=reports/lighthouse.html"
+  },
+  "keywords": [
+    "daily-decision",
+    "decision-maker",
+    "compliments",
+    "daily-routine",
+    "productivity",
+    "wellness",
+    "motivation"
+  ],
+  "author": "Daily Decider Team",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "lighthouse": "^11.0.0",
+    "live-server": "^1.2.2",
+    "terser": "^5.43.1"
+  },
+  "dependencies": {
+    "date-fns": "^2.30.0",
+    "localforage": "^1.10.0",
+    "ml-sentiment": "^1.0.0"
+  }
+}

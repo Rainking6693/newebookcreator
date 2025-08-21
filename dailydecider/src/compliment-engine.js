@@ -1,0 +1,451 @@
+class ComplimentEngine {
+    constructor() {
+        this.compliments = [];
+        this.userPreferences = new Map();
+        this.usageHistory = [];
+        this.temporalProcessor = new TemporalProcessor();
+        this.categories = [
+            'analytical', 'confidence', 'wisdom', 'energy', 'transformation',
+            'leadership', 'patience', 'balance', 'optimism', 'empathy',
+            'insight', 'clarity', 'curiosity', 'gratitude', 'humor',
+            'growth', 'self-compassion', 'adventure', 'composure', 'timing'
+        ];
+        this.initialized = false;
+    }
+
+    async initialize() {
+        if (this.initialized) return;
+        
+        try {
+            const response = await fetch('/data/compliments.json');
+            const data = await response.json();
+            this.compliments = data.compliments;
+            this.categoryDescriptions = data.categories;
+            this.personalityMatching = data.personality_matching;
+            this.timeOptimization = data.time_optimization;
+            this.seasonalThemes = data.seasonal_themes;
+            this.initialized = true;
+        } catch (error) {
+            console.error('Failed to load compliments database:', error);
+            this.loadFallbackCompliments();
+        }
+    }
+
+    async getPersonalizedCompliment(context = {}) {
+        await this.initialize();
+        
+        const sessionId = context.sessionId || 'anonymous';
+        const timestamp = context.timestamp || Date.now();
+        const userProfile = this.getUserProfile(sessionId);
+        
+        const temporalAnalysis = this.temporalProcessor.analyze(timestamp);
+        const candidateCompliments = this.filterCompliments(temporalAnalysis, userProfile, context);
+        
+        if (candidateCompliments.length === 0) {
+            return this.getFallbackCompliment(temporalAnalysis);
+        }
+        
+        const selectedCompliment = this.selectOptimalCompliment(candidateCompliments, userProfile, temporalAnalysis);
+        
+        await this.recordComplimentUsage(sessionId, selectedCompliment, temporalAnalysis);
+        await this.updateUserProfile(sessionId, selectedCompliment, context.feedback);
+        
+        return this.formatComplimentResponse(selectedCompliment, temporalAnalysis);
+    }
+
+    filterCompliments(temporalAnalysis, userProfile, context) {
+        let candidates = [...this.compliments];
+        
+        candidates = this.filterByTimeContext(candidates, temporalAnalysis.timeOfDay);
+        candidates = this.filterBySeason(candidates, temporalAnalysis.season);
+        candidates = this.filterByPersonality(candidates, userProfile);
+        candidates = this.filterByRecentUsage(candidates, context.sessionId);
+        candidates = this.filterByComplexityPreference(candidates, userProfile);
+        
+        return candidates;
+    }
+
+    filterByTimeContext(compliments, timeOfDay) {
+        return compliments.filter(compliment => {
+            const timeContexts = compliment.time_context || ['any'];
+            return timeContexts.includes('any') || timeContexts.includes(timeOfDay);
+        });
+    }
+
+    filterBySeason(compliments, season) {
+        return compliments.filter(compliment => {
+            const seasonalRelevance = compliment.seasonal_relevance || ['any'];
+            return seasonalRelevance.includes('any') || seasonalRelevance.includes(season);
+        });
+    }
+
+    filterByPersonality(compliments, userProfile) {
+        if (!userProfile.personalityTraits) return compliments;
+        
+        return compliments.filter(compliment => {
+            const complimentTags = compliment.personality_tags || [];
+            const userTraits = Object.keys(userProfile.personalityTraits);
+            
+            if (complimentTags.length === 0) return true;
+            
+            const matchScore = complimentTags.reduce((score, tag) => {
+                const traitScore = userProfile.personalityTraits[tag] || 0;
+                return score + traitScore;
+            }, 0);
+            
+            return matchScore > 0.3;
+        });
+    }
+
+    filterByRecentUsage(compliments, sessionId) {
+        if (!sessionId) return compliments;
+        
+        const recentUsage = this.usageHistory
+            .filter(usage => usage.sessionId === sessionId)
+            .filter(usage => Date.now() - usage.timestamp < 24 * 60 * 60 * 1000)
+            .map(usage => usage.complimentId);
+        
+        return compliments.filter(compliment => !recentUsage.includes(compliment.id));
+    }
+
+    filterByComplexityPreference(compliments, userProfile) {
+        if (!userProfile.preferredComplexity) return compliments;
+        
+        return compliments.filter(compliment => {
+            const complexity = compliment.complexity_level || 'medium';
+            return complexity === userProfile.preferredComplexity || 
+                   Math.random() < 0.3;
+        });
+    }
+
+    selectOptimalCompliment(candidates, userProfile, temporalAnalysis) {
+        if (candidates.length === 1) return candidates[0];
+        
+        const scoredCompliments = candidates.map(compliment => ({
+            compliment,
+            score: this.calculateComplimentScore(compliment, userProfile, temporalAnalysis)
+        }));
+        
+        scoredCompliments.sort((a, b) => b.score - a.score);
+        
+        const topTier = scoredCompliments.filter(sc => sc.score >= scoredCompliments[0].score * 0.9);
+        const selected = topTier[Math.floor(Math.random() * Math.min(3, topTier.length))];
+        
+        return selected.compliment;
+    }
+
+    calculateComplimentScore(compliment, userProfile, temporalAnalysis) {
+        let score = compliment.sentiment_score || 0.5;
+        
+        const timeBonus = this.calculateTimeBonus(compliment, temporalAnalysis);
+        const personalityBonus = this.calculatePersonalityBonus(compliment, userProfile);
+        const noveltyBonus = this.calculateNoveltyBonus(compliment, userProfile);
+        const seasonalBonus = this.calculateSeasonalBonus(compliment, temporalAnalysis);
+        
+        score += timeBonus * 0.2;
+        score += personalityBonus * 0.3;
+        score += noveltyBonus * 0.2;
+        score += seasonalBonus * 0.15;
+        
+        return Math.min(1, score);
+    }
+
+    calculateTimeBonus(compliment, temporalAnalysis) {
+        const timeContexts = compliment.time_context || ['any'];
+        if (timeContexts.includes('any')) return 0.5;
+        if (timeContexts.includes(temporalAnalysis.timeOfDay)) return 1.0;
+        return 0.2;
+    }
+
+    calculatePersonalityBonus(compliment, userProfile) {
+        if (!userProfile.personalityTraits) return 0.5;
+        
+        const complimentTags = compliment.personality_tags || [];
+        if (complimentTags.length === 0) return 0.5;
+        
+        const matchScore = complimentTags.reduce((score, tag) => {
+            return score + (userProfile.personalityTraits[tag] || 0);
+        }, 0) / complimentTags.length;
+        
+        return matchScore;
+    }
+
+    calculateNoveltyBonus(compliment, userProfile) {
+        const usageCount = compliment.usage_count || 0;
+        const userUsageCount = userProfile.complimentHistory ? 
+            userProfile.complimentHistory.filter(id => id === compliment.id).length : 0;
+        
+        if (userUsageCount === 0) return 1.0;
+        if (userUsageCount === 1) return 0.7;
+        if (userUsageCount === 2) return 0.4;
+        return 0.1;
+    }
+
+    calculateSeasonalBonus(compliment, temporalAnalysis) {
+        const seasonalRelevance = compliment.seasonal_relevance || ['any'];
+        if (seasonalRelevance.includes('any')) return 0.5;
+        if (seasonalRelevance.includes(temporalAnalysis.season)) return 1.0;
+        return 0.3;
+    }
+
+    getUserProfile(sessionId) {
+        if (!this.userPreferences.has(sessionId)) {
+            this.userPreferences.set(sessionId, this.createDefaultProfile());
+        }
+        return this.userPreferences.get(sessionId);
+    }
+
+    createDefaultProfile() {
+        return {
+            personalityTraits: {
+                analytical: 0.5,
+                creative: 0.5,
+                social: 0.5,
+                introspective: 0.5,
+                adventurous: 0.5,
+                confident: 0.5
+            },
+            preferredCategories: [],
+            preferredComplexity: 'medium',
+            complimentHistory: [],
+            satisfactionScores: [],
+            averageSatisfaction: 0.75,
+            adaptationRate: 0.1
+        };
+    }
+
+    async recordComplimentUsage(sessionId, compliment, temporalAnalysis) {
+        const usage = {
+            sessionId,
+            complimentId: compliment.id,
+            category: compliment.category,
+            timestamp: Date.now(),
+            timeOfDay: temporalAnalysis.timeOfDay,
+            season: temporalAnalysis.season
+        };
+        
+        this.usageHistory.push(usage);
+        
+        if (this.usageHistory.length > 10000) {
+            this.usageHistory = this.usageHistory.slice(-5000);
+        }
+        
+        compliment.usage_count = (compliment.usage_count || 0) + 1;
+        compliment.last_used = Date.now();
+    }
+
+    async updateUserProfile(sessionId, compliment, feedback = null) {
+        const profile = this.getUserProfile(sessionId);
+        
+        profile.complimentHistory.push(compliment.id);
+        if (profile.complimentHistory.length > 100) {
+            profile.complimentHistory = profile.complimentHistory.slice(-50);
+        }
+        
+        if (feedback) {
+            profile.satisfactionScores.push(feedback.satisfaction || 0.75);
+            if (profile.satisfactionScores.length > 20) {
+                profile.satisfactionScores = profile.satisfactionScores.slice(-10);
+            }
+            
+            profile.averageSatisfaction = profile.satisfactionScores.reduce((a, b) => a + b) / profile.satisfactionScores.length;
+        }
+        
+        if (!profile.preferredCategories.includes(compliment.category)) {
+            profile.preferredCategories.push(compliment.category);
+        }
+        
+        const personalityTags = compliment.personality_tags || [];
+        personalityTags.forEach(tag => {
+            if (profile.personalityTraits[tag]) {
+                profile.personalityTraits[tag] += profile.adaptationRate;
+                profile.personalityTraits[tag] = Math.min(1, profile.personalityTraits[tag]);
+            }
+        });
+        
+        this.userPreferences.set(sessionId, profile);
+    }
+
+    formatComplimentResponse(compliment, temporalAnalysis) {
+        const response = {
+            text: compliment.text,
+            category: compliment.category,
+            categoryDescription: this.categoryDescriptions[compliment.category],
+            sentiment: compliment.sentiment_score,
+            personalityMatch: compliment.personality_tags,
+            timeContext: compliment.time_context,
+            seasonalRelevance: compliment.seasonal_relevance,
+            complexity: compliment.complexity_level,
+            temporalFactors: {
+                timeOfDay: temporalAnalysis.timeOfDay,
+                season: temporalAnalysis.season,
+                optimalTiming: temporalAnalysis.temporalFactors.clarity > 0.7
+            },
+            metadata: {
+                id: compliment.id,
+                timestamp: Date.now(),
+                usageCount: compliment.usage_count || 0
+            }
+        };
+        
+        return response;
+    }
+
+    getFallbackCompliment(temporalAnalysis) {
+        const fallbackCompliments = [
+            "You're approaching today with exactly the right energy.",
+            "Your thoughtfulness in seeking guidance shows real wisdom.",
+            "There's something special about your perspective that deserves recognition.",
+            "You have a gift for turning challenges into opportunities.",
+            "Your willingness to reflect and grow is genuinely inspiring."
+        ];
+        
+        const selected = fallbackCompliments[Math.floor(Math.random() * fallbackCompliments.length)];
+        
+        return {
+            text: selected,
+            category: 'general',
+            categoryDescription: 'General encouragement and support',
+            sentiment: 0.8,
+            personalityMatch: ['any'],
+            timeContext: ['any'],
+            seasonalRelevance: ['any'],
+            complexity: 'simple',
+            temporalFactors: {
+                timeOfDay: temporalAnalysis.timeOfDay,
+                season: temporalAnalysis.season,
+                optimalTiming: true
+            },
+            metadata: {
+                id: 'fallback',
+                timestamp: Date.now(),
+                usageCount: 0
+            }
+        };
+    }
+
+    loadFallbackCompliments() {
+        this.compliments = [
+            {
+                id: 1,
+                text: "Your ability to seek guidance shows real wisdom.",
+                category: "wisdom",
+                sentiment_score: 0.8,
+                personality_tags: ["analytical", "introspective"],
+                time_context: ["any"],
+                seasonal_relevance: ["any"],
+                complexity_level: "simple"
+            },
+            {
+                id: 2,
+                text: "You're taking exactly the right approach to this decision.",
+                category: "confidence",
+                sentiment_score: 0.85,
+                personality_tags: ["confident", "analytical"],
+                time_context: ["morning", "afternoon"],
+                seasonal_relevance: ["any"],
+                complexity_level: "simple"
+            },
+            {
+                id: 3,
+                text: "There's something admirable about how you consider all angles.",
+                category: "thoroughness",
+                sentiment_score: 0.82,
+                personality_tags: ["analytical", "careful"],
+                time_context: ["any"],
+                seasonal_relevance: ["any"],
+                complexity_level: "medium"
+            }
+        ];
+        this.initialized = true;
+    }
+
+    async getComplimentsByCategory(category, limit = 10) {
+        await this.initialize();
+        
+        return this.compliments
+            .filter(compliment => compliment.category === category)
+            .slice(0, limit);
+    }
+
+    async getComplimentsByPersonality(personalityTraits, limit = 10) {
+        await this.initialize();
+        
+        return this.compliments
+            .filter(compliment => {
+                const tags = compliment.personality_tags || [];
+                return tags.some(tag => personalityTraits.includes(tag));
+            })
+            .slice(0, limit);
+    }
+
+    async getDailyComplimentPlan(sessionId, days = 7) {
+        const plan = [];
+        const profile = this.getUserProfile(sessionId);
+        
+        for (let i = 0; i < days; i++) {
+            const futureDate = new Date(Date.now() + (i * 24 * 60 * 60 * 1000));
+            const temporalAnalysis = this.temporalProcessor.analyze(futureDate.getTime());
+            
+            const context = {
+                sessionId,
+                timestamp: futureDate.getTime(),
+                planning: true
+            };
+            
+            const compliment = await this.getPersonalizedCompliment(context);
+            
+            plan.push({
+                date: futureDate,
+                compliment: compliment,
+                optimalTime: this.getOptimalComplimentTime(temporalAnalysis),
+                reasoning: `Selected for ${temporalAnalysis.timeOfDay} energy during ${temporalAnalysis.season}`
+            });
+        }
+        
+        return plan;
+    }
+
+    getOptimalComplimentTime(temporalAnalysis) {
+        const recommendations = {
+            morning: "Start your day with confidence",
+            afternoon: "Midday motivation boost",
+            evening: "Reflective appreciation",
+            night: "Peaceful encouragement"
+        };
+        
+        return {
+            timeOfDay: temporalAnalysis.timeOfDay,
+            recommendation: recommendations[temporalAnalysis.timeOfDay],
+            score: temporalAnalysis.temporalFactors.clarity || 0.5
+        };
+    }
+
+    getAnalytics() {
+        const totalCompliments = this.compliments.length;
+        const totalUsage = this.usageHistory.length;
+        const categoryDistribution = {};
+        const timeDistribution = {};
+        const seasonalDistribution = {};
+        
+        this.compliments.forEach(compliment => {
+            categoryDistribution[compliment.category] = (categoryDistribution[compliment.category] || 0) + 1;
+        });
+        
+        this.usageHistory.forEach(usage => {
+            timeDistribution[usage.timeOfDay] = (timeDistribution[usage.timeOfDay] || 0) + 1;
+            seasonalDistribution[usage.season] = (seasonalDistribution[usage.season] || 0) + 1;
+        });
+        
+        return {
+            totalCompliments,
+            totalUsage,
+            categoryDistribution,
+            timeDistribution,
+            seasonalDistribution,
+            averageSentiment: this.compliments.reduce((sum, c) => sum + (c.sentiment_score || 0), 0) / totalCompliments,
+            mostPopularCategory: Object.keys(categoryDistribution).reduce((a, b) => categoryDistribution[a] > categoryDistribution[b] ? a : b, 'general'),
+            userProfiles: this.userPreferences.size
+        };
+    }
+}

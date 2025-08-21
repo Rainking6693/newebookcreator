@@ -1,0 +1,538 @@
+class PatternMatcher {
+    constructor() {
+        this.patterns = new Map();
+        this.userHistory = new Map();
+        this.contextPatterns = [];
+        this.successMetrics = new Map();
+        this.adaptationRate = 0.1;
+        this.minPatternOccurrences = 3;
+        this.maxHistorySize = 1000;
+    }
+
+    findPatterns(question, decisionHistory, userProfile = null) {
+        const analysis = {
+            historicalAccuracy: 0.75,
+            optionBias: [],
+            recommendationStrength: 0,
+            patternConfidence: 0,
+            similarDecisions: [],
+            userTendencies: {}
+        };
+
+        try {
+            analysis.similarDecisions = this.findSimilarDecisions(question, decisionHistory);
+            analysis.userTendencies = this.analyzeUserTendencies(decisionHistory, userProfile);
+            analysis.optionBias = this.calculateOptionBias(question, decisionHistory);
+            analysis.recommendationStrength = this.calculateRecommendationStrength(analysis);
+            analysis.patternConfidence = this.calculatePatternConfidence(analysis);
+            analysis.historicalAccuracy = this.calculateHistoricalAccuracy(analysis.similarDecisions);
+        } catch (error) {
+            console.error('Pattern matching error:', error);
+        }
+
+        return analysis;
+    }
+
+    findSimilarDecisions(question, decisionHistory) {
+        const questionTokens = this.tokenizeQuestion(question);
+        const questionFingerprint = this.createQuestionFingerprint(questionTokens);
+        
+        return decisionHistory
+            .map(decision => ({
+                decision,
+                similarity: this.calculateSimilarity(questionFingerprint, decision)
+            }))
+            .filter(item => item.similarity > 0.3)
+            .sort((a, b) => b.similarity - a.similarity)
+            .slice(0, 10);
+    }
+
+    tokenizeQuestion(question) {
+        const stopWords = ['a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from', 'in', 'is', 'it', 'of', 'on', 'or', 'that', 'the', 'to', 'was', 'will', 'with'];
+        
+        return question
+            .toLowerCase()
+            .replace(/[^\w\s]/g, '')
+            .split(/\s+/)
+            .filter(word => word.length > 2 && !stopWords.includes(word));
+    }
+
+    createQuestionFingerprint(tokens) {
+        const fingerprint = {
+            keywords: tokens,
+            keywordCount: {},
+            questionType: this.classifyQuestionType(tokens),
+            complexity: this.assessComplexity(tokens),
+            emotionalTone: this.detectEmotionalTone(tokens),
+            decisionDomain: this.identifyDecisionDomain(tokens)
+        };
+
+        tokens.forEach(token => {
+            fingerprint.keywordCount[token] = (fingerprint.keywordCount[token] || 0) + 1;
+        });
+
+        return fingerprint;
+    }
+
+    calculateSimilarity(fingerprint1, decision) {
+        if (!decision.questionHash) return 0;
+
+        const fingerprint2 = this.createQuestionFingerprint(
+            this.tokenizeQuestion(decision.originalQuestion || '')
+        );
+
+        let similarity = 0;
+        
+        // Keyword overlap similarity
+        const keywords1 = new Set(fingerprint1.keywords);
+        const keywords2 = new Set(fingerprint2.keywords);
+        const intersection = new Set([...keywords1].filter(x => keywords2.has(x)));
+        const union = new Set([...keywords1, ...keywords2]);
+        
+        similarity += (intersection.size / union.size) * 0.4;
+
+        // Question type similarity
+        if (fingerprint1.questionType === fingerprint2.questionType) {
+            similarity += 0.2;
+        }
+
+        // Complexity similarity
+        if (fingerprint1.complexity === fingerprint2.complexity) {
+            similarity += 0.1;
+        }
+
+        // Emotional tone similarity
+        if (fingerprint1.emotionalTone === fingerprint2.emotionalTone) {
+            similarity += 0.15;
+        }
+
+        // Decision domain similarity
+        if (fingerprint1.decisionDomain === fingerprint2.decisionDomain) {
+            similarity += 0.15;
+        }
+
+        return Math.min(1, similarity);
+    }
+
+    classifyQuestionType(tokens) {
+        if (tokens.some(token => ['should', 'would', 'could'].includes(token))) {
+            return 'conditional';
+        }
+        if (tokens.some(token => ['when', 'how', 'why', 'where', 'what'].includes(token))) {
+            return 'interrogative';
+        }
+        if (tokens.some(token => ['vs', 'versus', 'or', 'between'].includes(token))) {
+            return 'comparison';
+        }
+        if (tokens.some(token => ['buy', 'purchase', 'invest', 'spend'].includes(token))) {
+            return 'financial';
+        }
+        return 'general';
+    }
+
+    assessComplexity(tokens) {
+        const complexWords = tokens.filter(token => token.length > 6);
+        const complexityRatio = complexWords.length / tokens.length;
+        
+        if (complexityRatio > 0.4 || tokens.length > 15) return 'high';
+        if (complexityRatio > 0.2 || tokens.length > 8) return 'medium';
+        return 'low';
+    }
+
+    detectEmotionalTone(tokens) {
+        const emotionalWords = {
+            positive: ['happy', 'excited', 'confident', 'optimistic', 'great', 'good', 'love', 'like', 'enjoy'],
+            negative: ['worried', 'anxious', 'stressed', 'concerned', 'bad', 'hate', 'dislike', 'afraid', 'scared'],
+            urgent: ['urgent', 'immediately', 'asap', 'quickly', 'deadline', 'rush', 'emergency'],
+            uncertain: ['maybe', 'perhaps', 'possibly', 'unsure', 'doubt', 'confused', 'uncertain']
+        };
+
+        for (const [tone, words] of Object.entries(emotionalWords)) {
+            if (tokens.some(token => words.includes(token))) {
+                return tone;
+            }
+        }
+
+        return 'neutral';
+    }
+
+    identifyDecisionDomain(tokens) {
+        const domains = {
+            career: ['job', 'career', 'work', 'profession', 'boss', 'salary', 'promotion', 'interview'],
+            relationship: ['relationship', 'dating', 'marriage', 'friend', 'family', 'partner', 'love'],
+            financial: ['money', 'buy', 'purchase', 'invest', 'budget', 'save', 'expensive', 'cheap'],
+            health: ['health', 'doctor', 'medicine', 'exercise', 'diet', 'weight', 'fitness'],
+            education: ['school', 'college', 'university', 'study', 'learn', 'course', 'degree'],
+            lifestyle: ['move', 'travel', 'hobby', 'habit', 'routine', 'lifestyle', 'change'],
+            technology: ['computer', 'software', 'app', 'internet', 'digital', 'tech', 'online']
+        };
+
+        for (const [domain, keywords] of Object.entries(domains)) {
+            if (tokens.some(token => keywords.includes(token))) {
+                return domain;
+            }
+        }
+
+        return 'general';
+    }
+
+    analyzeUserTendencies(decisionHistory, userProfile) {
+        const tendencies = {
+            riskTolerance: 0.5,
+            decisionSpeed: 'medium',
+            optionPreference: 'balanced',
+            satisfactionTrend: 0.75,
+            consistencyScore: 0.7,
+            adaptabilityScore: 0.6,
+            confidencePattern: 'stable',
+            timePreferences: {
+                morning: 0,
+                afternoon: 0,
+                evening: 0,
+                night: 0
+            }
+        };
+
+        if (decisionHistory.length < 3) return tendencies;
+
+        try {
+            tendencies.riskTolerance = this.calculateRiskTolerance(decisionHistory);
+            tendencies.decisionSpeed = this.analyzeDecisionSpeed(decisionHistory);
+            tendencies.optionPreference = this.analyzeOptionPreference(decisionHistory);
+            tendencies.satisfactionTrend = this.calculateSatisfactionTrend(decisionHistory);
+            tendencies.consistencyScore = this.calculateConsistencyScore(decisionHistory);
+            tendencies.confidencePattern = this.analyzeConfidencePattern(decisionHistory);
+            tendencies.timePreferences = this.analyzeTimePreferences(decisionHistory);
+        } catch (error) {
+            console.error('Error analyzing user tendencies:', error);
+        }
+
+        return tendencies;
+    }
+
+    calculateRiskTolerance(decisionHistory) {
+        const riskIndicators = decisionHistory.map(decision => {
+            if (!decision.result) return 0.5;
+            
+            let riskScore = 0;
+            
+            // High confidence decisions tend to be less risky
+            if (decision.result.confidence > 0.8) riskScore -= 0.2;
+            else if (decision.result.confidence < 0.4) riskScore += 0.3;
+            
+            // Quick decisions might indicate higher risk tolerance
+            if (decision.result.processingTime < 1000) riskScore += 0.1;
+            
+            // Binary decisions with close confidence might indicate risk-taking
+            if (decision.result.alternatives && decision.result.alternatives.length === 2) {
+                if (Math.abs(decision.result.confidence - 0.5) < 0.2) riskScore += 0.2;
+            }
+            
+            return Math.max(0, Math.min(1, 0.5 + riskScore));
+        });
+
+        return riskIndicators.reduce((sum, score) => sum + score, 0) / riskIndicators.length;
+    }
+
+    analyzeDecisionSpeed(decisionHistory) {
+        const speeds = decisionHistory
+            .filter(d => d.result && d.result.processingTime)
+            .map(d => d.result.processingTime);
+
+        if (speeds.length === 0) return 'medium';
+
+        const avgSpeed = speeds.reduce((sum, speed) => sum + speed, 0) / speeds.length;
+
+        if (avgSpeed < 2000) return 'fast';
+        if (avgSpeed > 10000) return 'slow';
+        return 'medium';
+    }
+
+    analyzeOptionPreference(decisionHistory) {
+        const optionCounts = decisionHistory.map(d => {
+            if (d.result && d.result.alternatives) {
+                return d.result.alternatives.length + 1;
+            }
+            return 2; // Default binary
+        });
+
+        const avgOptions = optionCounts.reduce((sum, count) => sum + count, 0) / optionCounts.length;
+
+        if (avgOptions < 2.5) return 'binary';
+        if (avgOptions > 4) return 'multiple';
+        return 'balanced';
+    }
+
+    calculateSatisfactionTrend(decisionHistory) {
+        const satisfactionScores = decisionHistory
+            .filter(d => d.result && typeof d.result.userSatisfaction === 'number')
+            .map(d => d.result.userSatisfaction);
+
+        if (satisfactionScores.length === 0) return 0.75;
+
+        // Calculate weighted average with more recent decisions having higher weight
+        let totalWeight = 0;
+        let weightedSum = 0;
+
+        satisfactionScores.forEach((score, index) => {
+            const weight = Math.pow(1.1, index); // More recent = higher weight
+            weightedSum += score * weight;
+            totalWeight += weight;
+        });
+
+        return weightedSum / totalWeight;
+    }
+
+    calculateConsistencyScore(decisionHistory) {
+        if (decisionHistory.length < 5) return 0.7;
+
+        const confidenceScores = decisionHistory
+            .filter(d => d.result && typeof d.result.confidence === 'number')
+            .map(d => d.result.confidence);
+
+        if (confidenceScores.length < 3) return 0.7;
+
+        // Calculate variance in confidence scores
+        const mean = confidenceScores.reduce((sum, score) => sum + score, 0) / confidenceScores.length;
+        const variance = confidenceScores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / confidenceScores.length;
+        
+        // Lower variance = higher consistency
+        return Math.max(0, 1 - variance * 2);
+    }
+
+    analyzeConfidencePattern(decisionHistory) {
+        const confidenceScores = decisionHistory
+            .filter(d => d.result && typeof d.result.confidence === 'number')
+            .map(d => d.result.confidence)
+            .slice(-10); // Last 10 decisions
+
+        if (confidenceScores.length < 3) return 'stable';
+
+        const trend = this.calculateTrend(confidenceScores);
+        
+        if (trend > 0.05) return 'increasing';
+        if (trend < -0.05) return 'decreasing';
+        return 'stable';
+    }
+
+    analyzeTimePreferences(decisionHistory) {
+        const timePreferences = {
+            morning: 0,
+            afternoon: 0,
+            evening: 0,
+            night: 0
+        };
+
+        decisionHistory.forEach(decision => {
+            const hour = new Date(decision.timestamp).getHours();
+            let timeOfDay;
+            
+            if (hour >= 5 && hour < 12) timeOfDay = 'morning';
+            else if (hour >= 12 && hour < 17) timeOfDay = 'afternoon';
+            else if (hour >= 17 && hour < 22) timeOfDay = 'evening';
+            else timeOfDay = 'night';
+            
+            timePreferences[timeOfDay]++;
+        });
+
+        const total = Object.values(timePreferences).reduce((sum, count) => sum + count, 0);
+        if (total === 0) return timePreferences;
+
+        Object.keys(timePreferences).forEach(time => {
+            timePreferences[time] = timePreferences[time] / total;
+        });
+
+        return timePreferences;
+    }
+
+    calculateTrend(values) {
+        if (values.length < 2) return 0;
+        
+        const n = values.length;
+        const sumX = n * (n - 1) / 2;
+        const sumY = values.reduce((sum, val) => sum + val, 0);
+        const sumXY = values.reduce((sum, val, index) => sum + index * val, 0);
+        const sumXX = n * (n - 1) * (2 * n - 1) / 6;
+        
+        return (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    }
+
+    calculateOptionBias(question, decisionHistory) {
+        const similarDecisions = this.findSimilarDecisions(question, decisionHistory);
+        const optionBias = [];
+
+        if (similarDecisions.length < 2) return optionBias;
+
+        const outcomes = {};
+        similarDecisions.forEach(({ decision }) => {
+            if (decision.result && decision.result.decision) {
+                const outcome = decision.result.decision;
+                outcomes[outcome] = (outcomes[outcome] || 0) + 1;
+            }
+        });
+
+        const totalDecisions = Object.values(outcomes).reduce((sum, count) => sum + count, 0);
+        
+        Object.entries(outcomes).forEach(([option, count]) => {
+            optionBias.push({
+                option,
+                bias: count / totalDecisions,
+                confidence: Math.min(1, count / 5) // Higher confidence with more occurrences
+            });
+        });
+
+        return optionBias.sort((a, b) => b.bias - a.bias);
+    }
+
+    calculateRecommendationStrength(analysis) {
+        let strength = 0;
+
+        // Strong patterns increase recommendation strength
+        if (analysis.similarDecisions.length > 3) {
+            strength += 0.3;
+        }
+
+        // High confidence in historical patterns
+        if (analysis.patternConfidence > 0.7) {
+            strength += 0.25;
+        }
+
+        // Clear option bias
+        if (analysis.optionBias.length > 0 && analysis.optionBias[0].bias > 0.6) {
+            strength += 0.2;
+        }
+
+        // High historical accuracy
+        if (analysis.historicalAccuracy > 0.8) {
+            strength += 0.25;
+        }
+
+        return Math.min(1, strength);
+    }
+
+    calculatePatternConfidence(analysis) {
+        let confidence = 0;
+
+        // More similar decisions = higher confidence
+        confidence += Math.min(0.4, analysis.similarDecisions.length * 0.05);
+
+        // Strong tendencies = higher confidence  
+        if (analysis.userTendencies.consistencyScore > 0.7) {
+            confidence += 0.3;
+        }
+
+        // Clear bias patterns = higher confidence
+        if (analysis.optionBias.length > 0) {
+            const strongestBias = analysis.optionBias[0];
+            if (strongestBias.bias > 0.6) {
+                confidence += 0.3;
+            }
+        }
+
+        return Math.min(1, confidence);
+    }
+
+    calculateHistoricalAccuracy(similarDecisions) {
+        if (similarDecisions.length === 0) return 0.75;
+
+        const accuracyScores = similarDecisions.map(({ decision }) => {
+            if (!decision.result || typeof decision.result.userSatisfaction !== 'number') {
+                return 0.75; // Default accuracy
+            }
+            return decision.result.userSatisfaction;
+        });
+
+        return accuracyScores.reduce((sum, score) => sum + score, 0) / accuracyScores.length;
+    }
+
+    updatePatterns(questionHash, decision, userFeedback = null) {
+        // Store decision patterns for future analysis
+        if (!this.patterns.has(questionHash)) {
+            this.patterns.set(questionHash, []);
+        }
+
+        const pattern = {
+            decision,
+            timestamp: Date.now(),
+            feedback: userFeedback
+        };
+
+        this.patterns.get(questionHash).push(pattern);
+
+        // Limit pattern storage
+        const patterns = this.patterns.get(questionHash);
+        if (patterns.length > 10) {
+            patterns.splice(0, patterns.length - 10);
+        }
+
+        // Update success metrics if feedback is provided
+        if (userFeedback && typeof userFeedback.satisfaction === 'number') {
+            this.updateSuccessMetrics(questionHash, userFeedback.satisfaction);
+        }
+    }
+
+    updateSuccessMetrics(questionHash, satisfaction) {
+        if (!this.successMetrics.has(questionHash)) {
+            this.successMetrics.set(questionHash, {
+                totalSatisfaction: 0,
+                count: 0,
+                average: 0
+            });
+        }
+
+        const metrics = this.successMetrics.get(questionHash);
+        metrics.totalSatisfaction += satisfaction;
+        metrics.count += 1;
+        metrics.average = metrics.totalSatisfaction / metrics.count;
+    }
+
+    getPatternInsights(userHistory) {
+        return {
+            totalPatterns: this.patterns.size,
+            averageAccuracy: this.calculateOverallAccuracy(),
+            strongestPatterns: this.getStrongestPatterns(),
+            recommendations: this.generatePatternRecommendations(userHistory)
+        };
+    }
+
+    calculateOverallAccuracy() {
+        const accuracies = Array.from(this.successMetrics.values())
+            .map(metrics => metrics.average)
+            .filter(avg => !isNaN(avg));
+
+        if (accuracies.length === 0) return 0.75;
+        return accuracies.reduce((sum, acc) => sum + acc, 0) / accuracies.length;
+    }
+
+    getStrongestPatterns() {
+        return Array.from(this.successMetrics.entries())
+            .filter(([hash, metrics]) => metrics.count >= this.minPatternOccurrences)
+            .sort(([, a], [, b]) => b.average - a.average)
+            .slice(0, 5)
+            .map(([hash, metrics]) => ({ hash, accuracy: metrics.average, count: metrics.count }));
+    }
+
+    generatePatternRecommendations(userHistory) {
+        const recommendations = [];
+        
+        if (userHistory && userHistory.length > 10) {
+            const tendencies = this.analyzeUserTendencies(userHistory);
+            
+            if (tendencies.consistencyScore < 0.5) {
+                recommendations.push("Consider taking more time to reflect on decisions for better consistency");
+            }
+            
+            if (tendencies.satisfactionTrend < 0.6) {
+                recommendations.push("Your recent decision satisfaction is low - consider changing your approach");
+            }
+            
+            if (tendencies.riskTolerance > 0.8) {
+                recommendations.push("You tend to take high risks - consider more careful evaluation");
+            } else if (tendencies.riskTolerance < 0.3) {
+                recommendations.push("You might benefit from being more open to taking calculated risks");
+            }
+        }
+        
+        return recommendations;
+    }
+}
