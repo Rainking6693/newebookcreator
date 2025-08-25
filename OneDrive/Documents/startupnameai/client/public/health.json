@@ -1,0 +1,12 @@
+{
+  "status": "healthy",
+  "service": "startupnamer-client",
+  "version": "1.0.0",
+  "timestamp": "2025-08-25T00:00:00Z",
+  "environment": "production",
+  "checks": {
+    "build": "passed",
+    "dependencies": "resolved",
+    "environment_vars": "configured"
+  }
+}
