@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Editor - AI Ebook Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .editor-content {
+            min-height: 500px;
+            line-height: 1.6;
+        }
+        .chapter-nav {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-book-open text-2xl text-blue-600 mr-2"></i>
+                        <span class="text-xl font-bold text-gray-900">AI Ebook Platform</span>
+                    </div>
+                    <div class="hidden md:ml-10 md:flex space-x-8">
+                        <a href="dashboard.html" class="text-gray-500 hover:text-gray-700 px-1 pt-1 pb-4 text-sm font-medium">Dashboard</a>
+                        <a href="#" class="text-blue-600 border-b-2 border-blue-600 px-1 pt-1 pb-4 text-sm font-medium">Books</a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700 px-1 pt-1 pb-4 text-sm font-medium">Market Research</a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700 px-1 pt-1 pb-4 text-sm font-medium">Analytics</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Save Status -->
+                    <div class="flex items-center text-sm text-gray-500">
+                        <i class="fas fa-check-circle text-green-500 mr-1"></i>
+                        <span>Saved</span>
+                    </div>
+                    <!-- Word Count -->
+                    <div class="text-sm text-gray-500">
+                        <span class="font-medium">23,450</span> words
+                    </div>
+                    <!-- Export Button -->
+                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm">
+                        <i class="fas fa-download mr-1"></i>Export
+                    </button>
+                    <!-- Profile -->
+                    <div class="relative">
+                        <button class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <img class="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Profile">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex h-screen">
+        <!-- Left Sidebar - Chapter Navigation -->
+        <div class="w-80 bg-white border-r border-gray-200 flex flex-col">
+            <!-- Book Header -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between mb-4">
+                    <h1 class="text-lg font-semibold text-gray-900 truncate">The Mystery of Blackwood Manor</h1>
+                    <button class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+                <div class="flex items-center text-sm text-gray-500 mb-3">
+                    <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs font-medium mr-2">Mystery</span>
+                    <span>23,450 / 50,000 words</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-blue-600 h-2 rounded-full" style="width: 47%"></div>
+                </div>
+            </div>
+
+            <!-- Chapter List -->
+            <div class="flex-1 chapter-nav">
+                <div class="p-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-sm font-semibold text-gray-900">Chapters</h2>
+                        <button class="text-blue-600 hover:text-blue-700 text-sm">
+                            <i class="fas fa-plus mr-1"></i>Add
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <!-- Chapter 1 -->
+                        <div class="p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900">Chapter 1: The Arrival</h3>
+                                    <p class="text-xs text-gray-500">2,340 words</p>
+                                </div>
+                                <i class="fas fa-check-circle text-green-500"></i>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 2 -->
+                        <div class="p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900">Chapter 2: Strange Sounds</h3>
+                                    <p class="text-xs text-gray-500">1,890 words</p>
+                                </div>
+                                <i class="fas fa-check-circle text-green-500"></i>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 3 -->
+                        <div class="p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900">Chapter 3: The Discovery</h3>
+                                    <p class="text-xs text-gray-500">2,150 words</p>
+                                </div>
+                                <i class="fas fa-check-circle text-green-500"></i>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 4 -->
+                        <div class="p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900">Chapter 4: Hidden Secrets</h3>
+                                    <p class="text-xs text-gray-500">1,720 words</p>
+                                </div>
+                                <i class="fas fa-check-circle text-green-500"></i>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 5 - Active -->
+                        <div class="p-3 rounded-lg bg-blue-50 border border-blue-200 cursor-pointer">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-medium text-blue-900">Chapter 5: The Confrontation</h3>
+                                    <p class="text-xs text-blue-600">3,240 words</p>
+                                </div>
+                                <i class="fas fa-edit text-blue-600"></i>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 6 - In Progress -->
+                        <div class="p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900">Chapter 6: The Truth Revealed</h3>
+                                    <p class="text-xs text-gray-500">890 words</p>
+                                </div>
+                                <i class="fas fa-clock text-yellow-500"></i>
+                            </div>
+                        </div>
+
+                        <!-- Chapter 7 - Planned -->
+                        <div class="p-3 rounded-lg border border-dashed border-gray-300 hover:bg-gray-50 cursor-pointer">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-500">Chapter 7: Resolution</h3>
+                                    <p class="text-xs text-gray-400">Not started</p>
+                                </div>
+                                <i class="fas fa-plus text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Actions -->
+            <div class="p-4 border-t border-gray-200">
+                <div class="space-y-2">
+                    <button class="w-full text-left p-2 rounded-lg hover:bg-gray-50 transition text-sm">
+                        <i class="fas fa-users text-gray-400 mr-2"></i>
+                        <span class="text-gray-700">Collaborators</span>
+                    </button>
+                    <button class="w-full text-left p-2 rounded-lg hover:bg-gray-50 transition text-sm">
+                        <i class="fas fa-history text-gray-400 mr-2"></i>
+                        <span class="text-gray-700">Version History</span>
+                    </button>
+                    <button class="w-full text-left p-2 rounded-lg hover:bg-gray-50 transition text-sm">
+                        <i class="fas fa-share text-gray-400 mr-2"></i>
+                        <span class="text-gray-700">Share Book</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Editor Area -->
+        <div class="flex-1 flex flex-col">
+            <!-- Editor Toolbar -->
+            <div class="bg-white border-b border-gray-200 p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <!-- Formatting Tools -->
+                        <div class="flex items-center space-x-1">
+                            <button class="p-2 rounded hover:bg-gray-100 transition">
+                                <i class="fas fa-bold text-gray-600"></i>
+                            </button>
+                            <button class="p-2 rounded hover:bg-gray-100 transition">
+                                <i class="fas fa-italic text-gray-600"></i>
+                            </button>
+                            <button class="p-2 rounded hover:bg-gray-100 transition">
+                                <i class="fas fa-underline text-gray-600"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="w-px h-6 bg-gray-300"></div>
+                        
+                        <!-- Text Alignment -->
+                        <div class="flex items-center space-x-1">
+                            <button class="p-2 rounded hover:bg-gray-100 transition">
+                                <i class="fas fa-align-left text-gray-600"></i>
+                            </button>
+                            <button class="p-2 rounded hover:bg-gray-100 transition">
+                                <i class="fas fa-align-center text-gray-600"></i>
+                            </button>
+                            <button class="p-2 rounded hover:bg-gray-100 transition">
+                                <i class="fas fa-align-right text-gray-600"></i>
+                            </button>
+                        </div>
+
+                        <div class="w-px h-6 bg-gray-300"></div>
+
+                        <!-- Lists -->
+                        <div class="flex items-center space-x-1">
+                            <button class="p-2 rounded hover:bg-gray-100 transition">
+                                <i class="fas fa-list-ul text-gray-600"></i>
+                            </button>
+                            <button class="p-2 rounded hover:bg-gray-100 transition">
+                                <i class="fas fa-list-ol text-gray-600"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <!-- Focus Mode -->
+                        <button class="p-2 rounded hover:bg-gray-100 transition text-gray-600">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <!-- Comments -->
+                        <button class="p-2 rounded hover:bg-gray-100 transition text-gray-600">
+                            <i class="fas fa-comment"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Editor Content -->
+            <div class="flex-1 flex">
+                <!-- Writing Area -->
+                <div class="flex-1 p-8">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="mb-6">
+                            <h1 class="text-2xl font-bold text-gray-900 mb-2">Chapter 5: The Confrontation</h1>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <span>3,240 words</span>
+                                <span class="mx-2">•</span>
+                                <span>Last edited 2 hours ago</span>
+                            </div>
+                        </div>
+
+                        <div class="editor-content prose prose-lg max-w-none">
+                            <p class="text-gray-900 leading-relaxed mb-4">
+                                Detective Sarah Mitchell stood at the threshold of the manor's grand library, her hand trembling slightly as she reached for the ornate brass handle. The events of the past three days had led her to this moment—a confrontation that would either solve the mystery of Blackwood Manor or claim her as its next victim.
+                            </p>
+
+                            <p class="text-gray-900 leading-relaxed mb-4">
+                                The heavy oak door creaked open, revealing a room shrouded in shadows despite the afternoon sun streaming through tall windows. Dust motes danced in the golden light, and the musty smell of old books filled her nostrils. But it wasn't the familiar scent of aged paper that made her heart race—it was the figure seated behind the mahogany desk.
+                            </p>
+
+                            <p class="text-gray-900 leading-relaxed mb-4">
+                                "I've been expecting you, Detective," came the voice from the shadows. Lord Blackwood himself sat motionless, his piercing blue eyes fixed on her with an intensity that made her skin crawl. "Though I must admit, I hoped it wouldn't come to this."
+                            </p>
+
+                            <p class="text-gray-900 leading-relaxed mb-4">
+                                Sarah stepped into the room, her hand instinctively moving to the service weapon at her hip. "Lord Blackwood. We need to talk about the night Lady Catherine disappeared."
+                            </p>
+
+                            <p class="text-gray-900 leading-relaxed mb-4">
+                                A cold smile played at the corners of his mouth. "Ah yes, my dear departed wife. Such a tragic accident, wouldn't you agree?" His voice carried a mocking tone that sent chills down Sarah's spine.
+                            </p>
+
+                            <p class="text-gray-900 leading-relaxed mb-4">
+                                "That's where you're wrong," Sarah replied, her voice steady despite the fear coursing through her veins. "It wasn't an accident, and we both know it. The evidence doesn't lie, Lord Blackwood. The blood spatter patterns, the missing jewelry, the forged suicide note—it all points to murder."
+                            </p>
+
+                            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 my-6">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-lightbulb text-yellow-400"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-yellow-700">
+                                            <strong>AI Suggestion:</strong> Consider adding more sensory details here to heighten the tension. What does Sarah hear? Are there any sounds from outside the room?
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="text-gray-900 leading-relaxed mb-4">
+                                Lord Blackwood's composure began to crack. His fingers drummed nervously on the desk, and Sarah noticed a slight twitch in his left eye. "You have no proof," he said, but his voice lacked its earlier confidence.
+                            </p>
+
+                            <p class="text-gray-900 leading-relaxed mb-4">
+                                "Actually, I do." Sarah reached into her jacket pocket and withdrew a small evidence bag containing a distinctive cufflink. "We found this in the garden, near where Lady Catherine's body was discovered. It matches the one you're wearing right now."
+                            </p>
+
+                            <p class="text-gray-900 leading-relaxed mb-4 text-gray-500 italic">
+                                [Continue writing here...]
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Assistant Panel -->
+                <div class="w-80 bg-white border-l border-gray-200 flex flex-col">
+                    <div class="p-4 border-b border-gray-200">
+                        <h2 class="text-lg font-semibold text-gray-900 flex items-center">
+                            <i class="fas fa-robot text-purple-600 mr-2"></i>
+                            AI Assistant
+                        </h2>
+                    </div>
+
+                    <div class="flex-1 p-4 space-y-4">
+                        <!-- Quick Actions -->
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-900 mb-3">Quick Actions</h3>
+                            <div class="space-y-2">
+                                <button class="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
+                                    <div class="text-sm font-medium text-gray-900">Continue Writing</div>
+                                    <div class="text-xs text-gray-500">Generate next paragraph</div>
+                                </button>
+                                <button class="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
+                                    <div class="text-sm font-medium text-gray-900">Improve Text</div>
+                                    <div class="text-xs text-gray-500">Enhance selected content</div>
+                                </button>
+                                <button class="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
+                                    <div class="text-sm font-medium text-gray-900">Add Dialogue</div>
+                                    <div class="text-xs text-gray-500">Generate conversation</div>
+                                </button>
+                                <button class="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
+                                    <div class="text-sm font-medium text-gray-900">Describe Scene</div>
+                                    <div class="text-xs text-gray-500">Add vivid descriptions</div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Custom Prompt -->
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-900 mb-3">Custom Prompt</h3>
+                            <textarea 
+                                class="w-full p-3 border border-gray-200 rounded-lg text-sm resize-none" 
+                                rows="3" 
+                                placeholder="Ask AI to help with specific writing tasks..."
+                            ></textarea>
+                            <button class="w-full mt-2 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition text-sm">
+                                Generate
+                            </button>
+                        </div>
+
+                        <!-- Writing Tips -->
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-900 mb-3">Writing Tips</h3>
+                            <div class="space-y-3">
+                                <div class="p-3 bg-blue-50 rounded-lg">
+                                    <div class="text-sm font-medium text-blue-900 mb-1">Mystery Writing Tip</div>
+                                    <div class="text-xs text-blue-700">Plant clues early but reveal them gradually to maintain suspense.</div>
+                                </div>
+                                <div class="p-3 bg-green-50 rounded-lg">
+                                    <div class="text-sm font-medium text-green-900 mb-1">Dialogue Tip</div>
+                                    <div class="text-xs text-green-700">Each character should have a distinct voice and speaking pattern.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Usage Stats -->
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-900 mb-3">AI Usage</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">This Month</span>
+                                    <span class="font-medium">127 / 1,000</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-purple-600 h-2 rounded-full" style="width: 12.7%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple editor interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-save simulation
+            setInterval(function() {
+                // Simulate auto-save
+                console.log('Auto-saved');
+            }, 30000);
+
+            // Word count update simulation
+            function updateWordCount() {
+                // This would be connected to the actual editor
+                console.log('Word count updated');
+            }
+        });
+    </script>
+</body>
+</html>
