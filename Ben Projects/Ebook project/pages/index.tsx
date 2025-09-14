@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import Head from 'next/head';
 
-// Force rebuild - timestamp: 2024-09-14 14:30
+// EMERGENCY CACHE BUST - timestamp: 2024-09-14 17:45 - FORCE NETLIFY REBUILD
 
 export default function Home() {
   // Remove React event handlers - will use pure JavaScript instead for static export compatibility
