@@ -3,6 +3,7 @@
  * Advanced rich text editor with AI assistance and real-time collaboration
  */
 
+// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';

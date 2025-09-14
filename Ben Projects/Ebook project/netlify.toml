@@ -1,16 +1,15 @@
 [build]
-  publish = "out"
   command = "npm run build"
+  functions = "netlify/functions"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
 
-# Clear cache and rebuild - remove redirects entirely for troubleshooting
-# [[redirects]]
-#  from = "/*"
-#  to = "/index.html"
-#  status = 200
+# For Next.js deployment on Netlify
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
 
 [context.production]
   environment = { NODE_ENV = "production" }

@@ -30,4 +30,5 @@ imports = [
     "agents/hudson.toml",
     "agents/cora.toml",
     "agents/DirectDebugger.toml",
-    "agents/Claude.toml"]
+    "agents/Claude.toml",
+    "agents/jason.toml", ]

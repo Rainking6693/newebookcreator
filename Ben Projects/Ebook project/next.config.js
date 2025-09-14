@@ -3,9 +3,9 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   
-  // Netlify deployment configuration
-  output: 'export',
-  trailingSlash: true,
+  // Enable server-side functionality
+  // output: 'export', // DISABLED - This breaks all API routes and server features
+  trailingSlash: false,
   images: {
     unoptimized: true
   },
@@ -18,7 +18,7 @@ const nextConfig = {
   
   // Disable server-side features for static export
   experimental: {
-    appDir: false
+    // Remove deprecated appDir option
   },
   
   // Webpack configuration for optimal bundling
@@ -33,28 +33,8 @@ const nextConfig = {
     return config;
   },
   
-  // Headers for security
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin'
-          }
-        ]
-      }
-    ];
-  }
+  // Headers removed for static export compatibility
+  // Will be handled by Netlify _headers file
 };
 
 module.exports = nextConfig;

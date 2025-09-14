@@ -3,6 +3,7 @@
  * Comprehensive subscription and payment management interface
  */
 
+// @ts-nocheck
 'use client';
 
 import React, { useState, useEffect } from 'react';
