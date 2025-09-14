@@ -6,17 +6,12 @@
   NODE_VERSION = "18"
   NPM_VERSION = "9"
 
-# Only redirect HTML pages, not static assets
-[[redirects]]
-  from = "/_next/*"
-  to = "/_next/:splat"
-  status = 200
-  force = true
-
+# Exclude static assets from redirects
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false
 
 [context.production]
   environment = { NODE_ENV = "production" }
