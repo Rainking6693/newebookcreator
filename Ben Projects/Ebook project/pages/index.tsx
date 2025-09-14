@@ -1,30 +1,10 @@
 import React, { useEffect } from 'react';
 import Head from 'next/head';
 
+// Force rebuild - timestamp: 2024-09-14 14:30
+
 export default function Home() {
-  const handleStartWriting = () => {
-    alert('Welcome to EbookAI! The full application is coming soon. This demo shows the landing page is working correctly.');
-  };
-
-  const handleWatchDemo = () => {
-    alert('Demo video coming soon! The platform is fully functional and ready for book generation.');
-  };
-
-  const handleGetStarted = () => {
-    alert('Ready to get started? Contact us at contact@ebookai.com to begin your book generation journey!');
-  };
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  const handleNavClick = (sectionId: string) => (e: React.MouseEvent) => {
-    e.preventDefault();
-    scrollToSection(sectionId);
-  };
+  // Remove React event handlers - will use pure JavaScript instead for static export compatibility
   return (
     <>
       <Head>
@@ -79,8 +59,8 @@ export default function Home() {
               </div>
               <nav style={{ display: 'flex', gap: '32px' }}>
                 <a 
+                  id="nav-features"
                   href="#features" 
-                  onClick={handleNavClick('features')}
                   style={{ 
                     color: '#6b7280', 
                     textDecoration: 'none',
@@ -91,8 +71,8 @@ export default function Home() {
                   Features
                 </a>
                 <a 
+                  id="nav-pricing"
                   href="#pricing" 
-                  onClick={handleNavClick('pricing')}
                   style={{ 
                     color: '#6b7280', 
                     textDecoration: 'none',
@@ -103,8 +83,8 @@ export default function Home() {
                   Pricing
                 </a>
                 <a 
+                  id="nav-about"
                   href="#about" 
-                  onClick={handleNavClick('about')}
                   style={{ 
                     color: '#6b7280', 
                     textDecoration: 'none',
@@ -159,7 +139,7 @@ export default function Home() {
             alignItems: 'center'
           }}>
             <button 
-              onClick={handleStartWriting}
+              id="btn-start-writing"
               style={{ 
                 backgroundColor: '#2563eb', 
                 color: 'white', 
@@ -175,7 +155,7 @@ export default function Home() {
               Start Writing Now
             </button>
             <button 
-              onClick={handleWatchDemo}
+              id="btn-watch-demo"
               style={{ 
                 border: '1px solid #d1d5db', 
                 color: '#374151', 
@@ -647,7 +627,7 @@ export default function Home() {
                   <li style={{ marginBottom: '12px' }}>✓ Email support</li>
                 </ul>
                 <button 
-                  onClick={handleGetStarted}
+                  id="btn-get-started-1"
                   style={{ 
                     width: '100%',
                     backgroundColor: '#2563eb', 
@@ -721,7 +701,7 @@ export default function Home() {
                   <li style={{ marginBottom: '12px' }}>✓ Priority support</li>
                 </ul>
                 <button 
-                  onClick={handleGetStarted}
+                  id="btn-get-started-2"
                   style={{ 
                     width: '100%',
                     backgroundColor: '#2563eb', 
@@ -781,7 +761,7 @@ export default function Home() {
                   <li style={{ marginBottom: '12px' }}>✓ White-label options</li>
                 </ul>
                 <button 
-                  onClick={handleGetStarted}
+                  id="btn-get-started-3"
                   style={{ 
                     width: '100%',
                     backgroundColor: '#2563eb', 
@@ -936,8 +916,10 @@ export default function Home() {
       {/* Static export compatible JavaScript - will be included in the HTML */}
       <script dangerouslySetInnerHTML={{
         __html: `
-          // Wait for DOM to be ready
-          document.addEventListener('DOMContentLoaded', function() {
+          // Ensure this runs after React hydration and DOM is fully ready
+          function initializeInteractivity() {
+            console.log('Initializing EbookAI interactivity...');
+            
             // Navigation scroll functions
             function scrollToSection(sectionId) {
               const element = document.getElementById(sectionId);
@@ -946,42 +928,72 @@ export default function Home() {
               }
             }
             
-            // Handle navigation clicks
-            document.querySelectorAll('nav a[href^="#"]').forEach(function(link) {
-              link.addEventListener('click', function(e) {
-                e.preventDefault();
-                const href = this.getAttribute('href');
-                const sectionId = href.substring(1);
-                scrollToSection(sectionId);
-              });
-            });
+            // Handle navigation clicks using IDs
+            const navFeatures = document.getElementById('nav-features');
+            const navPricing = document.getElementById('nav-pricing');
+            const navAbout = document.getElementById('nav-about');
             
-            // Button handlers
-            function handleStartWriting() {
-              alert('Welcome to EbookAI! The full application is coming soon. This demo shows the landing page is working correctly.');
+            if (navFeatures) {
+              navFeatures.addEventListener('click', function(e) {
+                e.preventDefault();
+                scrollToSection('features');
+              });
             }
             
-            function handleWatchDemo() {
-              alert('Demo video coming soon! The platform is fully functional and ready for book generation.');
+            if (navPricing) {
+              navPricing.addEventListener('click', function(e) {
+                e.preventDefault();
+                scrollToSection('pricing');
+              });
+            }
+            
+            if (navAbout) {
+              navAbout.addEventListener('click', function(e) {
+                e.preventDefault();
+                scrollToSection('about');
+              });
+            }
+            
+            // Button handlers
+            const btnStartWriting = document.getElementById('btn-start-writing');
+            const btnWatchDemo = document.getElementById('btn-watch-demo');
+            const btnGetStarted1 = document.getElementById('btn-get-started-1');
+            const btnGetStarted2 = document.getElementById('btn-get-started-2');
+            const btnGetStarted3 = document.getElementById('btn-get-started-3');
+            
+            if (btnStartWriting) {
+              btnStartWriting.addEventListener('click', function() {
+                alert('Welcome to EbookAI! The full application is coming soon. This demo shows the landing page is working correctly.');
+              });
+            }
+            
+            if (btnWatchDemo) {
+              btnWatchDemo.addEventListener('click', function() {
+                alert('Demo video coming soon! The platform is fully functional and ready for book generation.');
+              });
             }
             
             function handleGetStarted() {
               alert('Ready to get started? Contact us at contact@ebookai.com to begin your book generation journey!');
             }
             
-            // Add button event listeners by finding buttons with specific text
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(function(button) {
-              const buttonText = button.textContent.trim();
-              if (buttonText === 'Start Writing Now') {
-                button.addEventListener('click', handleStartWriting);
-              } else if (buttonText === 'Watch Demo') {
-                button.addEventListener('click', handleWatchDemo);
-              } else if (buttonText === 'Get Started') {
-                button.addEventListener('click', handleGetStarted);
-              }
-            });
-          });
+            if (btnGetStarted1) btnGetStarted1.addEventListener('click', handleGetStarted);
+            if (btnGetStarted2) btnGetStarted2.addEventListener('click', handleGetStarted);
+            if (btnGetStarted3) btnGetStarted3.addEventListener('click', handleGetStarted);
+            
+            console.log('EbookAI interactivity initialized successfully!');
+          }
+          
+          // Try multiple initialization strategies to ensure it works
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeInteractivity);
+          } else {
+            // DOM is already loaded, initialize immediately
+            initializeInteractivity();
+          }
+          
+          // Also try after a short delay to ensure React hydration is complete
+          setTimeout(initializeInteractivity, 100);
         `
       }} />
     </>

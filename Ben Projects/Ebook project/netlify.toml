@@ -6,12 +6,11 @@
   NODE_VERSION = "18"
   NPM_VERSION = "9"
 
-# Exclude static assets from redirects
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = false
+# Clear cache and rebuild - remove redirects entirely for troubleshooting
+# [[redirects]]
+#  from = "/*"
+#  to = "/index.html"
+#  status = 200
 
 [context.production]
   environment = { NODE_ENV = "production" }
